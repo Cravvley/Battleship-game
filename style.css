@@ -1,0 +1,66 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.gameBoard {
+    position: absolute;
+    display: flex;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    height: 35vh;
+    width: 35vh;
+
+}
+
+#playerBoard {
+    top: 50%;
+    left: 65%;
+    transform: translate(-65%, -50%);
+}
+
+.boardH2 {
+    position: absolute;
+    color: rgb(200, 135, 49);
+    font-size: 30px;
+}
+
+#aiBoard {
+    top: 50%;
+    left: 35%;
+    transform: translate(-35%, -50%);
+}
+
+#playerBoardH2 {
+    top: 25%;
+    left: 59%;
+}
+
+#aiBoardH2 {
+    top: 25%;
+    left: 35%;
+}
+
+#gameName {
+    text-align: center;
+    color: rgb(200, 135, 49);
+    font-size: 50px;
+}
+
+.field {
+    flex-grow: 1;
+    border: 2px black solid;
+}
+
+.selectedPlayerCell {
+    background-color: greenyellow;
+}
+
+.destroyedPlayerCell {
+    background-color: red;
+}
+
+.shootedFieldCell {
+    background-color: darksalmon;
+}
