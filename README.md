@@ -1,1 +1,1 @@
-"# simple battleship game written in js" 
+simple battleship game written in js
