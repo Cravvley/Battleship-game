@@ -64,3 +64,12 @@
 .shootedFieldCell {
     background-color: blueviolet;
 }
+
+#endGameH2 {
+    position: absolute;
+    left: 46%;
+    top: 15%;
+    color: rgb(49, 77, 200);
+    font-size: 45px;
+    text-transform: uppercase;
+}

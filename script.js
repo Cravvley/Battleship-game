@@ -1,3 +1,7 @@
+//TODO : 
+// dodac proste ai
+// dodac lepsze ustawianie pozycji
+
 const AI_BOARD='aiBoard'
 const PLAYER_BOARD='playerBoard'
 const SELECTED_PLAYER_CELL='selectedPlayerCell'
@@ -23,19 +27,21 @@ let aiShootState={
     checkRight:false,
     checkBottom:false,
     checkLeft:false,
-    lastXPositionChecked:0,
-    lastYPositionChecked:0
+    firstXPositionChecked:-1,
+    firstYPositionChecked:-1,
+    lastXPositionChecked:-1,
+    lastYPositionChecked:-1,
 }
 
-const checkMapBeforeAddShip=(map,isVertical,addedShips,x, y)=>{
+const checkMapBeforeAddShip=(map,isVertical,addedShips,i, j)=>{
     if(isVertical){
         for(let index=1;index<ships-addedShips;++index){
-            if(x+index-1>=0){ 
-                if((map[x+index-1][y]!==0) || (x+index>=MAP_DIMENSIONS)){
+            if(i+index-1>=0){ 
+                if((map[i+index-1][j]!==0) || (i+index>=MAP_DIMENSIONS)){
                     return false
                 }
             }else{
-                if((map[x+index][y]!==0) || (x+index>=MAP_DIMENSIONS)){ 
+                if((map[i+index][j]!==0) || (i+index>=MAP_DIMENSIONS)){ 
                     return false
                 }
             }
@@ -43,7 +49,7 @@ const checkMapBeforeAddShip=(map,isVertical,addedShips,x, y)=>{
     }
     if(!isVertical){
         for(let index=0;index<ships-addedShips;++index){
-            if((map[x][y+index]!==0) || (y+index>MAP_DIMENSIONS)){  
+            if((map[i][j+index]!==0) || (j+index>MAP_DIMENSIONS)){  
                 return false
             }
         }
@@ -52,22 +58,23 @@ const checkMapBeforeAddShip=(map,isVertical,addedShips,x, y)=>{
 }
 
 const addAiShips=()=>{
-    let x=Math.floor(Math.random()*MAP_DIMENSIONS)
-    let y=Math.floor(Math.random()*MAP_DIMENSIONS)
-    const addShip=checkMapBeforeAddShip(aiArr,!vertical,aiAddedShips,x,y);
+    let i=Math.floor(Math.random()*MAP_DIMENSIONS)
+    let j=Math.floor(Math.random()*MAP_DIMENSIONS)
+
+    const addShip=checkMapBeforeAddShip(aiArr,!vertical,aiAddedShips,i,j);
     if(addShip){
         vertical=!vertical;
         aiAddedShips++;
         let indexHelper=0;
         for(let index=aiAddedShips;index<=ships;++index){
             if(vertical){
-                if(x+indexHelper-1>=0){
-                    aiArr[x+indexHelper-1][y]=1
+                if(i+indexHelper-1>=0){
+                    aiArr[i+indexHelper-1][j]=1
                 }else{
-                    aiArr[x+indexHelper][y]=1
+                    aiArr[i+indexHelper][j]=1
                 }     
             }else{
-                aiArr[x][y+indexHelper]=1;
+                aiArr[i][j+indexHelper]=1;
             }
             indexHelper++;
         }
@@ -80,10 +87,10 @@ const addAiShips=()=>{
 }
 
 const addPlayerShips=(e)=>{
-        let x= Number(e.target.getAttribute('i'))
-        let y= Number(e.target.getAttribute('j'))
+        let i= Number(e.target.getAttribute('i'))
+        let j= Number(e.target.getAttribute('j'))
 
-        const addShip=checkMapBeforeAddShip(playerArr,!vertical,userAddedShips,x,y);
+        const addShip=checkMapBeforeAddShip(playerArr,!vertical,userAddedShips,i,j);
         if(addShip){
             vertical=!vertical;
             userAddedShips++;
@@ -91,12 +98,12 @@ const addPlayerShips=(e)=>{
             let indexHelper=0;
             for(let index=userAddedShips;index<=ships;++index){
                 if(vertical){
-                    playerArr[x+indexHelper][y]=1
-                    const fieldItem=document.querySelector(`div[i="${x+indexHelper}"][j="${y}"][parentboard=${PLAYER_BOARD}]`)
+                    playerArr[i+indexHelper][j]=1
+                    const fieldItem=document.querySelector(`div[i="${i+indexHelper}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
                     fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }else{
-                    playerArr[x][y+indexHelper]=1;
-                    const fieldItem=document.querySelector(`div[i="${x}"][j="${y+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
+                    playerArr[i][j+indexHelper]=1;
+                    const fieldItem=document.querySelector(`div[i="${i}"][j="${j+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
                     fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }
                 indexHelper++;
@@ -112,6 +119,27 @@ const addPlayerShips=(e)=>{
         } 
 }
 
+const endGame=()=>{
+    if(!playerArr.some(e=>e.includes(1)) || !aiArr.some(e=>e.includes(1))){
+        const endGameField=document.getElementById("endGameH2")
+        console.log(endGameField)
+        const aiFieldItems=document.querySelectorAll(`div[parentboard=${AI_BOARD}]`)
+        const playerFieldItems=document.querySelectorAll(`div[parentboard=${PLAYER_BOARD}]`)
+        aiFieldItems.forEach(e=>e.removeEventListener('click',shootThisGuy))
+        playerFieldItems.forEach(e=>e.removeEventListener('click',shootThisAi))
+
+        if(!playerArr.some(e=>e.includes(1))){
+            endGameField.innerText="You lost"
+        }
+        else if(!aiArr.some(e=>e.includes(1))){
+            endGameField.innerText="You won"
+        }
+        return true
+    }
+    return false
+}
+
+
 const shootThisAi=e=>{
     const i= Number(e.target.getAttribute('i'))
     const j= Number(e.target.getAttribute('j'))
@@ -122,25 +150,108 @@ const shootThisAi=e=>{
     }
     else{
         e.target.classList+= ' ' + SHOOTED_FIELD_CELL;
+        aiArr[i][j]=-2
     }    
     const fieldItem=document.querySelector(`div[i="${i}"][j="${j}"][parentboard=${AI_BOARD}]`)
     fieldItem.removeEventListener('click',shootThisAi)
-    shootThisGuy()
+    const isEnd=endGame()
+    if(!endGame){
+        shootThisGuy()
+    }
 }
 
 const shootThisGuy=()=>{
-    let x=Math.floor(Math.random()*MAP_DIMENSIONS)
-    let y=Math.floor(Math.random()*MAP_DIMENSIONS)
-    const fieldItem=document.querySelector(`div[i="${x}"][j="${y}"][parentboard=${PLAYER_BOARD}]`)
+    let i=0
+    let j=0
+    let canMakeMove=true
 
-     if(playerArr[x][y]===1){
-        playerArr[x][y]===-1;
-        fieldItem.classList.remove(SELECTED_PLAYER_CELL);
-        fieldItem.classList+= ' ' + DESTROYED_PLAYER_CELL;
-     }else{
-        fieldItem.classList+= ' ' + SHOOTED_FIELD_CELL;
+    if(aiShootState.checkTop||aiShootState.checkRight||
+        aiShootState.checkBottom||aiShootState.checkLeft){    
+            // if(aiShootState.checkTop){
+            //     if(!aiShootState.lastYPositionChecked+1<MAP_DIMENSIONS){
+            //         canMakeMove=false
+            //     }else{
+            //         aiShootState.lastXPositionChecked+=1
+            //         i=aiShootState.lastXPositionChecked
+            //         j=aiShootState.lastYPositionChecked
+            //     }
+            // }else if(aiShootState.checkBottom){
+            //     if(!aiShootState.lastYPositionChecked-1>=0){
+            //         canMakeMove=false
+            //     }else{
+            //         aiShootState.lastXPositionChecked-=1
+            //         i=aiShootState.lastXPositionChecked
+            //         j=aiShootState.lastYPositionChecked
+            //     }
+            // }else if(aiShootState.checkRight){
+            //     if(!aiShootState.lastXPositionChecked+1<MAP_DIMENSIONS){
+            //         canMakeMove=false
+            //     }else{
+            //         aiShootState.lastYPositionChecked+=1
+            //         i=aiShootState.lastXPositionChecked
+            //         j=aiShootState.lastYPositionChecked
+            //     }
+            // }else if(aiShootState.checkLeft){
+            //     if(!aiShootState.lastXPositionChecked-1>=0){
+            //         canMakeMove=false
+            //     }else{
+            //         aiShootState.lastYPositionChecked-=1
+            //         i=aiShootState.lastXPositionChecked
+            //         j=aiShootState.lastYPositionChecked
+            //     }
+            // }        
+        }
+    else{
+        do{
+            i=Math.floor(Math.random()*MAP_DIMENSIONS)
+            j=Math.floor(Math.random()*MAP_DIMENSIONS)    
+        }while(playerArr[i][j]===-1 || playerArr[i][j]===-2)
      }
+
+    if(canMakeMove){
+        const fieldItem=document.querySelector(`div[i="${i}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
+        if(playerArr[i][j]===1){
+         
+            // if(aiShootState.firstXPositionChecked===-1){
+            //     aiShootState.firstXPositionChecked=i
+            //     aiShootState.lastXPositionChecked=i
+            //     aiShootState.firstYPositionChecked=j
+            //     aiShootState.lastYPositionChecked=j
+            //     aiShootState.checkTop=true
+            // }
+    
+            playerArr[i][j]=-1;
+            fieldItem.classList.remove(SELECTED_PLAYER_CELL);
+            fieldItem.classList+= ' ' + DESTROYED_PLAYER_CELL;
+         }else{
+            fieldItem.classList+= ' ' + SHOOTED_FIELD_CELL;
+            playerArr[i][j]=-2;
+          //  aiNewCoordinateShoot();
+         }
+    }else{
+       // aiNewCoordinateShoot();
+    }
 }
+
+// const aiNewCoordinateShoot=()=>{
+//     if(aiShootState.checkTop){
+//         aiShootState.checkTop=false
+//         aiShootState.checkRight=true
+//     }else if(aiShootState.checkRight){
+//         aiShootState.checkRight=false
+//         aiShootState.checkBottom=true
+//     }
+//     else if(aiShootState.checkBottom){
+//         aiShootState.checkBottom=false
+//         aiShootState.checkLeft=true
+//     }else if(aiShootState.checkLeft){
+//         aiShootState.checkLeft=false
+//         aiShootState.firstXPositionChecked=-1
+//         aiShootState.firstYPositionChecked=-1
+//     }
+//     aiShootState.lastXPositionChecked=aiShootState.firstXPositionChecked;
+//     aiShootState.lastYPositionChecked=aiShootState.firstYPositionChecked;
+// }
 
 const mapGenerator=(map)=>{
     const mapHeight=map.clientHeight/MAP_DIMENSIONS + 'px'
