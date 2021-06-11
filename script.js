@@ -15,87 +15,114 @@ let aiArr=[]
 let playerArr=[]
 
 let userAddedShips=0
+let aiAddedShips=0
 let vertical=false;
 
-const checkMapBeforeAddShip=(playerArr,isVertical,x, y)=>{
-
+const checkMapBeforeAddShip=(map,isVertical,x, y)=>{
     if(isVertical){
-        for(let index=0;index<ships-userAddedShips;++index){
-            if((playerArr[x+index][y]!=0) || (x+index>=MAP_DIMENSIONS)){
-                return false
+        for(let index=1;index<ships-userAddedShips;++index){
+            if(x+index-1>=0){
+                if((map[x+index-1][y]!=0) || (x+index>=MAP_DIMENSIONS)){
+                    return false
+                }
+            }else{
+                if((map[x+index][y]!=0) || (x+index>=MAP_DIMENSIONS)){ 
+                    return false
+                }
             }
         }
     }
-
     if(!isVertical){
         for(let index=0;index<ships-userAddedShips;++index){
-            if((playerArr[x][y+index]!=0) ||(y+index>=MAP_DIMENSIONS)){
+            if((map[x][y+index]!=0) || (y+index>=MAP_DIMENSIONS)){
                 return false
             }
         }
-    }
-    
+    } 
     return true;
 }
 
+const addAiShips=()=>{
+    let x=Math.floor(Math.random()*MAP_DIMENSIONS)
+    let y=Math.floor(Math.random()*MAP_DIMENSIONS)
+
+    const addShip=checkMapBeforeAddShip(aiArr,!vertical,x,y);
+
+    if(addShip){
+        vertical=!vertical;
+        aiAddedShips++;
+        let indexHelper=0;
+            for(let index=aiAddedShips;index<=ships;++index){
+                if(vertical){
+                    aiArr[x+indexHelper][y]=1
+                }else{
+                    aiArr[x][y+indexHelper]=1;
+                }
+                indexHelper++;
+            }
+            
+            if(aiAddedShips===ships){
+                const fieldItems=document.querySelectorAll(`div[parentboard=${AI_BOARD}]`)
+                fieldItems.forEach(e=>e.addEventListener('click',shootThisAi))
+                vertical=false
+            }
+    }
+}
+
 const addPlayerShips=(e)=>{
+        let x= Number(e.target.getAttribute('i'))
+        let y= Number(e.target.getAttribute('j'))
 
+        const addShip=checkMapBeforeAddShip(playerArr,!vertical,x,y);
 
-        let i= Number(e.target.getAttribute('i'))
-        let j= Number(e.target.getAttribute('j'))
-
-        const addShip=checkMapBeforeAddShip(playerArr,!vertical,i,j);
         if(addShip){
             vertical=!vertical;
             userAddedShips++;
             e.target.className+= ' ' + SELECTED_PLAYER_CELL
             let indexHelper=0;
-            
             for(let index=userAddedShips;index<=ships;++index){
                 if(vertical){
-                    playerArr[i+indexHelper][j]=1
-                     const fieldItem=document.querySelector(`div[i="${i+indexHelper}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
+                    playerArr[x+indexHelper][y]=1
+                     const fieldItem=document.querySelector(`div[i="${x+indexHelper}"][j="${y}"][parentboard=${PLAYER_BOARD}]`)
                      fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }else{
-                    playerArr[i][j+indexHelper]=1;
-                    const fieldItem=document.querySelector(`div[i="${i}"][j="${j+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
+                    playerArr[x][y+indexHelper]=1;
+                    const fieldItem=document.querySelector(`div[i="${x}"][j="${y+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
                     fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }
                 indexHelper++;
             }
-
             if(userAddedShips===ships){
                 const fieldItems=document.querySelectorAll(`div[parentboard=${PLAYER_BOARD}]`)
-                fieldItems.forEach(e=>console.log(e.removeEventListener('click',addPlayerShips)))
+                fieldItems.forEach(e=>e.removeEventListener('click',addPlayerShips))
+                vertical=false
+                while(aiAddedShips!==ships){
+                    addAiShips()
+                }
             }
         } 
 }
 
-const shoot=e=>{
+// if(parentboard==PLAYER_BOARD){  
+//     if(playerArr[i][j]===1){
+//         playerArr[i][j]===-1;
+//         e.target.classList.remove(SELECTED_PLAYER_CELL);
+//         e.target.classList+= ' ' + DESTROYED_PLAYER_CELL;
+//     }
+
+const shootThisAi=e=>{
     const i= Number(e.target.getAttribute('i'))
     const j= Number(e.target.getAttribute('j'))
-    const parentboard=e.target.getAttribute('parentboard')
-    
-    if(e.target.classList.contains(SELECTED_PLAYER_CELL)){
-        if(parentboard==PLAYER_BOARD){  
-            if(playerArr[i][j]===1){
-                playerArr[i][j]==-1;
-               
-                e.target.classList.remove(SELECTED_PLAYER_CELL);
-                e.target.classList+= ' ' + DESTROYED_PLAYER_CELL;
-            }
-        }else{
-            e.target.classList.remove(SELECTED_PLAYER_CELL);
-                e.target.classList+= ' ' + SHOOTED_FIELD_CELL;
-        }
-        
-        if(e.target.getAttribute("parentboard")===PLAYER_BOARD){
-            playerArr[i][j]=0
-        }else{
-            aiArr[i][j]=0
-        }
 
+    if(aiArr[i][j]===1){
+        aiArr[i][j]=-1
+        e.target.classList+= ' ' + DESTROYED_PLAYER_CELL;
     }
+    else{
+        e.target.classList+= ' ' + SHOOTED_FIELD_CELL;
+    }     
+    const fieldItem=document.querySelector(`div[i="${i}"][j="${j}"][parentboard=${AI_BOARD}]`)
+    fieldItem.removeEventListener('click',shootThisAi)
 }
 
 const mapGenerator=(map)=>{
