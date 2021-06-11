@@ -18,23 +18,32 @@ let userAddedShips=0
 let aiAddedShips=0
 let vertical=false;
 
-const checkMapBeforeAddShip=(map,isVertical,x, y)=>{
+let aiShootState={
+    checkTop:false,
+    checkRight:false,
+    checkBottom:false,
+    checkLeft:false,
+    lastXPositionChecked:0,
+    lastYPositionChecked:0
+}
+
+const checkMapBeforeAddShip=(map,isVertical,addedShips,x, y)=>{
     if(isVertical){
-        for(let index=1;index<ships-userAddedShips;++index){
-            if(x+index-1>=0){
-                if((map[x+index-1][y]!=0) || (x+index>=MAP_DIMENSIONS)){
+        for(let index=1;index<ships-addedShips;++index){
+            if(x+index-1>=0){ 
+                if((map[x+index-1][y]!==0) || (x+index>=MAP_DIMENSIONS)){
                     return false
                 }
             }else{
-                if((map[x+index][y]!=0) || (x+index>=MAP_DIMENSIONS)){ 
+                if((map[x+index][y]!==0) || (x+index>=MAP_DIMENSIONS)){ 
                     return false
                 }
             }
         }
     }
     if(!isVertical){
-        for(let index=0;index<ships-userAddedShips;++index){
-            if((map[x][y+index]!=0) || (y+index>=MAP_DIMENSIONS)){
+        for(let index=0;index<ships-addedShips;++index){
+            if((map[x][y+index]!==0) || (y+index>MAP_DIMENSIONS)){  
                 return false
             }
         }
@@ -45,27 +54,28 @@ const checkMapBeforeAddShip=(map,isVertical,x, y)=>{
 const addAiShips=()=>{
     let x=Math.floor(Math.random()*MAP_DIMENSIONS)
     let y=Math.floor(Math.random()*MAP_DIMENSIONS)
-
-    const addShip=checkMapBeforeAddShip(aiArr,!vertical,x,y);
-
+    const addShip=checkMapBeforeAddShip(aiArr,!vertical,aiAddedShips,x,y);
     if(addShip){
         vertical=!vertical;
         aiAddedShips++;
         let indexHelper=0;
-            for(let index=aiAddedShips;index<=ships;++index){
-                if(vertical){
-                    aiArr[x+indexHelper][y]=1
+        for(let index=aiAddedShips;index<=ships;++index){
+            if(vertical){
+                if(x+indexHelper-1>=0){
+                    aiArr[x+indexHelper-1][y]=1
                 }else{
-                    aiArr[x][y+indexHelper]=1;
-                }
-                indexHelper++;
+                    aiArr[x+indexHelper][y]=1
+                }     
+            }else{
+                aiArr[x][y+indexHelper]=1;
             }
-            
-            if(aiAddedShips===ships){
-                const fieldItems=document.querySelectorAll(`div[parentboard=${AI_BOARD}]`)
-                fieldItems.forEach(e=>e.addEventListener('click',shootThisAi))
-                vertical=false
-            }
+            indexHelper++;
+        }
+        if(aiAddedShips===ships){
+            const fieldItems=document.querySelectorAll(`div[parentboard=${AI_BOARD}]`)
+            fieldItems.forEach(e=>e.addEventListener('click',shootThisAi))
+            vertical=false
+        }
     }
 }
 
@@ -73,8 +83,7 @@ const addPlayerShips=(e)=>{
         let x= Number(e.target.getAttribute('i'))
         let y= Number(e.target.getAttribute('j'))
 
-        const addShip=checkMapBeforeAddShip(playerArr,!vertical,x,y);
-
+        const addShip=checkMapBeforeAddShip(playerArr,!vertical,userAddedShips,x,y);
         if(addShip){
             vertical=!vertical;
             userAddedShips++;
@@ -83,8 +92,8 @@ const addPlayerShips=(e)=>{
             for(let index=userAddedShips;index<=ships;++index){
                 if(vertical){
                     playerArr[x+indexHelper][y]=1
-                     const fieldItem=document.querySelector(`div[i="${x+indexHelper}"][j="${y}"][parentboard=${PLAYER_BOARD}]`)
-                     fieldItem.classList.add(SELECTED_PLAYER_CELL)
+                    const fieldItem=document.querySelector(`div[i="${x+indexHelper}"][j="${y}"][parentboard=${PLAYER_BOARD}]`)
+                    fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }else{
                     playerArr[x][y+indexHelper]=1;
                     const fieldItem=document.querySelector(`div[i="${x}"][j="${y+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
@@ -103,13 +112,6 @@ const addPlayerShips=(e)=>{
         } 
 }
 
-// if(parentboard==PLAYER_BOARD){  
-//     if(playerArr[i][j]===1){
-//         playerArr[i][j]===-1;
-//         e.target.classList.remove(SELECTED_PLAYER_CELL);
-//         e.target.classList+= ' ' + DESTROYED_PLAYER_CELL;
-//     }
-
 const shootThisAi=e=>{
     const i= Number(e.target.getAttribute('i'))
     const j= Number(e.target.getAttribute('j'))
@@ -120,9 +122,24 @@ const shootThisAi=e=>{
     }
     else{
         e.target.classList+= ' ' + SHOOTED_FIELD_CELL;
-    }     
+    }    
     const fieldItem=document.querySelector(`div[i="${i}"][j="${j}"][parentboard=${AI_BOARD}]`)
     fieldItem.removeEventListener('click',shootThisAi)
+    shootThisGuy()
+}
+
+const shootThisGuy=()=>{
+    let x=Math.floor(Math.random()*MAP_DIMENSIONS)
+    let y=Math.floor(Math.random()*MAP_DIMENSIONS)
+    const fieldItem=document.querySelector(`div[i="${x}"][j="${y}"][parentboard=${PLAYER_BOARD}]`)
+
+     if(playerArr[x][y]===1){
+        playerArr[x][y]===-1;
+        fieldItem.classList.remove(SELECTED_PLAYER_CELL);
+        fieldItem.classList+= ' ' + DESTROYED_PLAYER_CELL;
+     }else{
+        fieldItem.classList+= ' ' + SHOOTED_FIELD_CELL;
+     }
 }
 
 const mapGenerator=(map)=>{
