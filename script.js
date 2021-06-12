@@ -1,6 +1,7 @@
 //TODO : 
 // dodac proste ai
 // dodac lepsze ustawianie pozycji
+//naprawic bug z za duza iloscia generowanych statkow u ai
 
 const AI_BOARD='aiBoard'
 const PLAYER_BOARD='playerBoard'
@@ -122,10 +123,7 @@ const addPlayerShips=(e)=>{
 const endGame=()=>{
     if(!playerArr.some(e=>e.includes(1)) || !aiArr.some(e=>e.includes(1))){
         const endGameField=document.getElementById("endGameH2")
-        console.log(endGameField)
-        const aiFieldItems=document.querySelectorAll(`div[parentboard=${AI_BOARD}]`)
-        const playerFieldItems=document.querySelectorAll(`div[parentboard=${PLAYER_BOARD}]`)
-        aiFieldItems.forEach(e=>e.removeEventListener('click',shootThisGuy))
+        const playerFieldItems=document.querySelectorAll(`div[parentboard=${AI_BOARD}]`)
         playerFieldItems.forEach(e=>e.removeEventListener('click',shootThisAi))
 
         if(!playerArr.some(e=>e.includes(1))){
@@ -138,7 +136,6 @@ const endGame=()=>{
     }
     return false
 }
-
 
 const shootThisAi=e=>{
     const i= Number(e.target.getAttribute('i'))
@@ -155,7 +152,7 @@ const shootThisAi=e=>{
     const fieldItem=document.querySelector(`div[i="${i}"][j="${j}"][parentboard=${AI_BOARD}]`)
     fieldItem.removeEventListener('click',shootThisAi)
     const isEnd=endGame()
-    if(!endGame){
+    if(!isEnd){
         shootThisGuy()
     }
 }
