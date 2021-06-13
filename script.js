@@ -1,7 +1,6 @@
 //TODO : 
 // dodac proste ai
 // dodac lepsze ustawianie pozycji
-//naprawic bug z za duza iloscia generowanych statkow u ai
 
 const AI_BOARD='aiBoard'
 const PLAYER_BOARD='playerBoard'
@@ -132,9 +131,7 @@ const endGame=()=>{
         else if(!aiArr.some(e=>e.includes(1))){
             endGameField.innerText="You won"
         }
-        return true
     }
-    return false
 }
 
 const shootThisAi=e=>{
@@ -151,10 +148,10 @@ const shootThisAi=e=>{
     }    
     const fieldItem=document.querySelector(`div[i="${i}"][j="${j}"][parentboard=${AI_BOARD}]`)
     fieldItem.removeEventListener('click',shootThisAi)
-    const isEnd=endGame()
-    if(!isEnd){
-        shootThisGuy()
-    }
+    
+    endGame()
+    while(!shootThisGuy()){}
+    endGame()
 }
 
 const shootThisGuy=()=>{
@@ -164,39 +161,40 @@ const shootThisGuy=()=>{
 
     if(aiShootState.checkTop||aiShootState.checkRight||
         aiShootState.checkBottom||aiShootState.checkLeft){    
-            // if(aiShootState.checkTop){
-            //     if(!aiShootState.lastYPositionChecked+1<MAP_DIMENSIONS){
-            //         canMakeMove=false
-            //     }else{
-            //         aiShootState.lastXPositionChecked+=1
-            //         i=aiShootState.lastXPositionChecked
-            //         j=aiShootState.lastYPositionChecked
-            //     }
-            // }else if(aiShootState.checkBottom){
-            //     if(!aiShootState.lastYPositionChecked-1>=0){
-            //         canMakeMove=false
-            //     }else{
-            //         aiShootState.lastXPositionChecked-=1
-            //         i=aiShootState.lastXPositionChecked
-            //         j=aiShootState.lastYPositionChecked
-            //     }
-            // }else if(aiShootState.checkRight){
-            //     if(!aiShootState.lastXPositionChecked+1<MAP_DIMENSIONS){
-            //         canMakeMove=false
-            //     }else{
-            //         aiShootState.lastYPositionChecked+=1
-            //         i=aiShootState.lastXPositionChecked
-            //         j=aiShootState.lastYPositionChecked
-            //     }
-            // }else if(aiShootState.checkLeft){
-            //     if(!aiShootState.lastXPositionChecked-1>=0){
-            //         canMakeMove=false
-            //     }else{
-            //         aiShootState.lastYPositionChecked-=1
-            //         i=aiShootState.lastXPositionChecked
-            //         j=aiShootState.lastYPositionChecked
-            //     }
-            // }        
+            if(aiShootState.checkTop){
+                if(!(aiShootState.lastXPositionChecked+1<MAP_DIMENSIONS)){
+                    canMakeMove=false
+                }else{
+                    aiShootState.lastXPositionChecked-=1
+                    i=aiShootState.lastXPositionChecked
+                    j=aiShootState.lastYPositionChecked
+                }
+            }else if(aiShootState.checkBottom){
+                if(!(aiShootState.lastYPositionChecked-1>=0)){
+                    canMakeMove=false
+                }else{
+                    aiShootState.lastXPositionChecked+=1
+                    i=aiShootState.lastXPositionChecked
+                    j=aiShootState.lastYPositionChecked
+                }
+            }else if(aiShootState.checkRight){
+                console.log("test")
+                if(!(aiShootState.lastYPositionChecked+1<MAP_DIMENSIONS)){
+                    canMakeMove=false
+                }else{
+                    aiShootState.lastYPositionChecked+=1
+                    i=aiShootState.lastXPositionChecked
+                    j=aiShootState.lastYPositionChecked
+                }
+            }else if(aiShootState.checkLeft){
+                if(!(aiShootState.lastXPositionChecked-1>=0)){
+                    canMakeMove=false
+                }else{
+                    aiShootState.lastYPositionChecked-=1
+                    i=aiShootState.lastXPositionChecked
+                    j=aiShootState.lastYPositionChecked
+                }
+            }        
         }
     else{
         do{
@@ -209,13 +207,13 @@ const shootThisGuy=()=>{
         const fieldItem=document.querySelector(`div[i="${i}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
         if(playerArr[i][j]===1){
          
-            // if(aiShootState.firstXPositionChecked===-1){
-            //     aiShootState.firstXPositionChecked=i
-            //     aiShootState.lastXPositionChecked=i
-            //     aiShootState.firstYPositionChecked=j
-            //     aiShootState.lastYPositionChecked=j
-            //     aiShootState.checkTop=true
-            // }
+            if(aiShootState.firstXPositionChecked===-1){
+                aiShootState.firstXPositionChecked=i
+                aiShootState.lastXPositionChecked=i
+                aiShootState.firstYPositionChecked=j
+                aiShootState.lastYPositionChecked=j
+                aiShootState.checkTop=true
+            }
     
             playerArr[i][j]=-1;
             fieldItem.classList.remove(SELECTED_PLAYER_CELL);
@@ -223,32 +221,33 @@ const shootThisGuy=()=>{
          }else{
             fieldItem.classList+= ' ' + SHOOTED_FIELD_CELL;
             playerArr[i][j]=-2;
-          //  aiNewCoordinateShoot();
+           aiNewCoordinateShoot();
          }
     }else{
-       // aiNewCoordinateShoot();
+        aiNewCoordinateShoot();
     }
+    endGame()
 }
 
-// const aiNewCoordinateShoot=()=>{
-//     if(aiShootState.checkTop){
-//         aiShootState.checkTop=false
-//         aiShootState.checkRight=true
-//     }else if(aiShootState.checkRight){
-//         aiShootState.checkRight=false
-//         aiShootState.checkBottom=true
-//     }
-//     else if(aiShootState.checkBottom){
-//         aiShootState.checkBottom=false
-//         aiShootState.checkLeft=true
-//     }else if(aiShootState.checkLeft){
-//         aiShootState.checkLeft=false
-//         aiShootState.firstXPositionChecked=-1
-//         aiShootState.firstYPositionChecked=-1
-//     }
-//     aiShootState.lastXPositionChecked=aiShootState.firstXPositionChecked;
-//     aiShootState.lastYPositionChecked=aiShootState.firstYPositionChecked;
-// }
+const aiNewCoordinateShoot=()=>{
+    if(aiShootState.checkTop){
+        aiShootState.checkTop=false
+        aiShootState.checkRight=true
+    }else if(aiShootState.checkRight){
+        aiShootState.checkRight=false
+        aiShootState.checkBottom=true
+    }
+    else if(aiShootState.checkBottom){
+        aiShootState.checkBottom=false
+        aiShootState.checkLeft=true
+    }else if(aiShootState.checkLeft){
+        aiShootState.checkLeft=false
+        aiShootState.firstXPositionChecked=-1
+        aiShootState.firstYPositionChecked=-1
+    }
+    aiShootState.lastXPositionChecked=aiShootState.firstXPositionChecked;
+    aiShootState.lastYPositionChecked=aiShootState.firstYPositionChecked;
+}
 
 const mapGenerator=(map)=>{
     const mapHeight=map.clientHeight/MAP_DIMENSIONS + 'px'
