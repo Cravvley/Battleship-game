@@ -151,48 +151,62 @@ const shootThisAi=e=>{
     
     endGame()
     while(!shootThisGuy()){}
-    endGame()
 }
 
 const shootThisGuy=()=>{
     let i=0
     let j=0
     let canMakeMove=true
-
+  
     if(aiShootState.checkTop||aiShootState.checkRight||
-        aiShootState.checkBottom||aiShootState.checkLeft){    
+        aiShootState.checkBottom||aiShootState.checkLeft){   
             if(aiShootState.checkTop){
+                if(!( aiShootState.lastXPositionChecked-1>=0)){
+                    canMakeMove=false
+                }else{
+                    if(playerArr[aiShootState.lastXPositionChecked-1][aiShootState.lastYPositionChecked]<0){
+                        canMakeMove=false
+                    }{
+                        aiShootState.lastXPositionChecked-=1
+                        i=aiShootState.lastXPositionChecked
+                        j=aiShootState.lastYPositionChecked
+                    }
+                }
+            }else if(aiShootState.checkBottom){
                 if(!(aiShootState.lastXPositionChecked+1<MAP_DIMENSIONS)){
                     canMakeMove=false
                 }else{
-                    aiShootState.lastXPositionChecked-=1
-                    i=aiShootState.lastXPositionChecked
-                    j=aiShootState.lastYPositionChecked
-                }
-            }else if(aiShootState.checkBottom){
-                if(!(aiShootState.lastYPositionChecked-1>=0)){
-                    canMakeMove=false
-                }else{
-                    aiShootState.lastXPositionChecked+=1
-                    i=aiShootState.lastXPositionChecked
-                    j=aiShootState.lastYPositionChecked
+                    if(playerArr[aiShootState.lastXPositionChecked+1][aiShootState.lastYPositionChecked]<0){
+                        canMakeMove=false
+                    }else{
+                        aiShootState.lastXPositionChecked+=1
+                        i=aiShootState.lastXPositionChecked
+                        j=aiShootState.lastYPositionChecked
+                    }
                 }
             }else if(aiShootState.checkRight){
-                console.log("test")
                 if(!(aiShootState.lastYPositionChecked+1<MAP_DIMENSIONS)){
                     canMakeMove=false
                 }else{
-                    aiShootState.lastYPositionChecked+=1
-                    i=aiShootState.lastXPositionChecked
-                    j=aiShootState.lastYPositionChecked
+                    if(playerArr[aiShootState.lastXPositionChecked][aiShootState.lastYPositionChecked+1]<0){
+                        canMakeMove=false
+                    }else{
+                        aiShootState.lastYPositionChecked+=1
+                        i=aiShootState.lastXPositionChecked
+                        j=aiShootState.lastYPositionChecked
+                    }
                 }
             }else if(aiShootState.checkLeft){
-                if(!(aiShootState.lastXPositionChecked-1>=0)){
+                if(!(aiShootState.lastYPositionChecked-1>=0)){
                     canMakeMove=false
                 }else{
-                    aiShootState.lastYPositionChecked-=1
-                    i=aiShootState.lastXPositionChecked
-                    j=aiShootState.lastYPositionChecked
+                    if(playerArr[aiShootState.lastXPositionChecked][aiShootState.lastYPositionChecked-1]<0){
+                        canMakeMove=false
+                    }else{
+                        aiShootState.lastYPositionChecked-=1
+                        i=aiShootState.lastXPositionChecked
+                        j=aiShootState.lastYPositionChecked
+                    }
                 }
             }        
         }
@@ -227,6 +241,7 @@ const shootThisGuy=()=>{
         aiNewCoordinateShoot();
     }
     endGame()
+    return canMakeMove
 }
 
 const aiNewCoordinateShoot=()=>{
