@@ -13,7 +13,6 @@ const FIELD_STATE = {
     SHIP: 1,
  };
 
-
 const aiBoard=document.getElementById(AI_BOARD)
 const playerBoard=document.getElementById(PLAYER_BOARD)
 
