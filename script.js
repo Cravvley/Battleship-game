@@ -1,7 +1,3 @@
-//TODO : 
-// dodac proste ai
-// dodac lepsze ustawianie pozycji
-
 const AI_BOARD='aiBoard'
 const PLAYER_BOARD='playerBoard'
 const SELECTED_PLAYER_CELL='selectedPlayerCell'
@@ -9,6 +5,14 @@ const DESTROYED_PLAYER_CELL='destroyedPlayerCell'
 const SHOOTED_FIELD_CELL='shootedFieldCell'
 const FIELD='field'
 const MAP_DIMENSIONS=10
+
+const FIELD_STATE = {
+    SHOOTED_FIELD:-2,
+    DESTROYED_SHIP:-1,
+    EMPTY: 0,
+    SHIP: 1,
+ };
+
 
 const aiBoard=document.getElementById(AI_BOARD)
 const playerBoard=document.getElementById(PLAYER_BOARD)
@@ -37,11 +41,11 @@ const checkMapBeforeAddShip=(map,isVertical,addedShips,i, j)=>{
     if(isVertical){
         for(let index=1;index<ships-addedShips;++index){
             if(i+index-1>=0){ 
-                if((map[i+index-1][j]!==0) || (i+index>=MAP_DIMENSIONS)){
+                if((map[i+index-1][j]!==FIELD_STATE.EMPTY) || (i+index>=MAP_DIMENSIONS)){
                     return false
                 }
             }else{
-                if((map[i+index][j]!==0) || (i+index>=MAP_DIMENSIONS)){ 
+                if((map[i+index][j]!==FIELD_STATE.EMPTY) || (i+index>=MAP_DIMENSIONS)){ 
                     return false
                 }
             }
@@ -49,7 +53,7 @@ const checkMapBeforeAddShip=(map,isVertical,addedShips,i, j)=>{
     }
     if(!isVertical){
         for(let index=0;index<ships-addedShips;++index){
-            if((map[i][j+index]!==0) || (j+index>MAP_DIMENSIONS)){  
+            if((map[i][j+index]!==FIELD_STATE.EMPTY) || (j+index>MAP_DIMENSIONS)){  
                 return false
             }
         }
@@ -69,12 +73,12 @@ const addAiShips=()=>{
         for(let index=aiAddedShips;index<=ships;++index){
             if(vertical){
                 if(i+indexHelper-1>=0){
-                    aiArr[i+indexHelper-1][j]=1
+                    aiArr[i+indexHelper-1][j]=FIELD_STATE.SHIP
                 }else{
-                    aiArr[i+indexHelper][j]=1
+                    aiArr[i+indexHelper][j]=FIELD_STATE.SHIP
                 }     
             }else{
-                aiArr[i][j+indexHelper]=1;
+                aiArr[i][j+indexHelper]=FIELD_STATE.SHIP;
             }
             indexHelper++;
         }
@@ -98,11 +102,11 @@ const addPlayerShips=(e)=>{
             let indexHelper=0;
             for(let index=userAddedShips;index<=ships;++index){
                 if(vertical){
-                    playerArr[i+indexHelper][j]=1
+                    playerArr[i+indexHelper][j]=FIELD_STATE.SHIP
                     const fieldItem=document.querySelector(`div[i="${i+indexHelper}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
                     fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }else{
-                    playerArr[i][j+indexHelper]=1;
+                    playerArr[i][j+indexHelper]=FIELD_STATE.SHIP
                     const fieldItem=document.querySelector(`div[i="${i}"][j="${j+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
                     fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }
@@ -120,15 +124,15 @@ const addPlayerShips=(e)=>{
 }
 
 const endGame=()=>{
-    if(!playerArr.some(e=>e.includes(1)) || !aiArr.some(e=>e.includes(1))){
+    if(!playerArr.some(e=>e.includes(FIELD_STATE.SHIP)) || !aiArr.some(e=>e.includes(FIELD_STATE.SHIP))){
         const endGameField=document.getElementById("endGameH2")
         const playerFieldItems=document.querySelectorAll(`div[parentboard=${AI_BOARD}]`)
         playerFieldItems.forEach(e=>e.removeEventListener('click',shootThisAi))
 
-        if(!playerArr.some(e=>e.includes(1))){
+        if(!playerArr.some(e=>e.includes(FIELD_STATE.SHIP))){
             endGameField.innerText="You lost"
         }
-        else if(!aiArr.some(e=>e.includes(1))){
+        else if(!aiArr.some(e=>e.includes(FIELD_STATE.SHIP))){
             endGameField.innerText="You won"
         }
     }
@@ -138,13 +142,13 @@ const shootThisAi=e=>{
     const i= Number(e.target.getAttribute('i'))
     const j= Number(e.target.getAttribute('j'))
 
-    if(aiArr[i][j]===1){
-        aiArr[i][j]=-1
+    if(aiArr[i][j]===FIELD_STATE.SHIP){
+        aiArr[i][j]=FIELD_STATE.DESTROYED_SHIP
         e.target.classList+= ' ' + DESTROYED_PLAYER_CELL;
     }
     else{
         e.target.classList+= ' ' + SHOOTED_FIELD_CELL;
-        aiArr[i][j]=-2
+        aiArr[i][j]=FIELD_STATE.SHOOTED_FIELD
     }    
     const fieldItem=document.querySelector(`div[i="${i}"][j="${j}"][parentboard=${AI_BOARD}]`)
     fieldItem.removeEventListener('click',shootThisAi)
@@ -214,12 +218,12 @@ const shootThisGuy=()=>{
         do{
             i=Math.floor(Math.random()*MAP_DIMENSIONS)
             j=Math.floor(Math.random()*MAP_DIMENSIONS)    
-        }while(playerArr[i][j]===-1 || playerArr[i][j]===-2)
+        }while(playerArr[i][j]===FIELD_STATE.DESTROYED_SHIP || playerArr[i][j]===FIELD_STATE.SHOOTED_FIELD)
      }
 
     if(canMakeMove){
         const fieldItem=document.querySelector(`div[i="${i}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
-        if(playerArr[i][j]===1){
+        if(playerArr[i][j]===FIELD_STATE.SHIP){
          
             if(aiShootState.firstXPositionChecked===-1){
                 aiShootState.firstXPositionChecked=i
@@ -229,12 +233,12 @@ const shootThisGuy=()=>{
                 aiShootState.checkTop=true
             }
     
-            playerArr[i][j]=-1;
+            playerArr[i][j]=FIELD_STATE.DESTROYED_SHIP;
             fieldItem.classList.remove(SELECTED_PLAYER_CELL);
             fieldItem.classList+= ' ' + DESTROYED_PLAYER_CELL;
          }else{
             fieldItem.classList+= ' ' + SHOOTED_FIELD_CELL;
-            playerArr[i][j]=-2;
+            playerArr[i][j]=FIELD_STATE.SHOOTED_FIELD;
            aiNewCoordinateShoot();
          }
     }else{
