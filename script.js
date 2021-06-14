@@ -4,7 +4,7 @@ const SELECTED_PLAYER_CELL='selectedPlayerCell'
 const DESTROYED_PLAYER_CELL='destroyedPlayerCell'
 const SHOOTED_FIELD_CELL='shootedFieldCell'
 const FIELD='field'
-const MAP_DIMENSIONS=11
+const MAP_DIMENSIONS=12
 
 const FIELD_STATE = {
     SHOOTED_FIELD:-2,
@@ -38,22 +38,18 @@ let aiShootState={
 
 const checkMapBeforeAddShip=(map,isVertical,addedShips,i, j)=>{
     if(isVertical){    
- 
         let indexIUpperHelper=i-1>=0 ? i-1 : i 
         let indexILowerHelper=(i+ships-addedShips)<MAP_DIMENSIONS ? i+ships-addedShips : MAP_DIMENSIONS-1
-
-        if(!((map[indexIUpperHelper][j]===FIELD_STATE.SHIP)||(map[indexILowerHelper][j]===FIELD_STATE.SHIP))){
-            for(let index=0;index<ships-addedShips;++index){
-                let indexHelper=i+index-1>=0 ? (i+index-1) : (i+index)
+        if(!((map[indexIUpperHelper][j]===FIELD_STATE.SHIP)||(map[indexILowerHelper][j]===FIELD_STATE.SHIP) )){
+            for(let index=0;index<ships-addedShips;++index){    
+                let indexHelper=i+index-1>=0 ? i+index-1 : i+index
                 let indexJUpperHelper=j-1>=0 ? j-1 : j 
                 let indexJLowerHelper=j+1<MAP_DIMENSIONS ? j+1 : j 
-                if(i+index-1>=0){ 
-                    if((map[indexHelper][indexJUpperHelper]===FIELD_STATE.SHIP)||(map[indexHelper][indexJLowerHelper]===FIELD_STATE.SHIP)||
-                        (map[indexHelper-1>=0?indexHelper-1:indexHelper][j]===FIELD_STATE.SHIP)||
+                    if((map[indexHelper+1<MAP_DIMENSIONS?indexHelper+1:indexHelper][indexJUpperHelper]===FIELD_STATE.SHIP)||
+                    (map[indexHelper +1<MAP_DIMENSIONS?indexHelper+1:indexHelper][indexJLowerHelper]===FIELD_STATE.SHIP)||
                         (map[indexHelper][j]!==FIELD_STATE.EMPTY) || (i+index>=MAP_DIMENSIONS)){
                         return false
                     }
-                }
             }
          }else{
              return false
@@ -62,8 +58,14 @@ const checkMapBeforeAddShip=(map,isVertical,addedShips,i, j)=>{
     if(!isVertical){ 
         let indexJLowerHelper= (j+ships-addedShips)<MAP_DIMENSIONS ? j+ships-addedShips : MAP_DIMENSIONS-1
         let indexJUpperHelper=j-1>=0 ? j-1 : j
+        let iPlusUpperOne= i+1<MAP_DIMENSIONS ? i+1 : i
+        let iPlusLowerOne= i-1>=0 ? i-1 : i
+        let jMinusStartUpperOne= j-1>=0 ? j-1 : j
+        let jPlusStartUpperOne = (j+ships-addedShips)<MAP_DIMENSIONS?j+ships-addedShips:MAP_DIMENSIONS-1
 
-        if(!((map[i][indexJLowerHelper]===FIELD_STATE.SHIP)||(map[i][indexJUpperHelper]===FIELD_STATE.SHIP))){
+        if(!((map[iPlusUpperOne][jMinusStartUpperOne]===FIELD_STATE.SHIP)||(map[iPlusUpperOne][jPlusStartUpperOne]===FIELD_STATE.SHIP)||
+        (map[iPlusLowerOne][jMinusStartUpperOne]===FIELD_STATE.SHIP)||(map[iPlusLowerOne][jPlusStartUpperOne]===FIELD_STATE.SHIP)||
+        (map[i][indexJLowerHelper]===FIELD_STATE.SHIP)||(map[i][indexJUpperHelper]===FIELD_STATE.SHIP))){
             for(let index=0;index<ships-addedShips;++index){
                 let indexIUpperHelper=i-1 >=0 ? i-1 : i 
                 let indexILowerHelper=i+1 <MAP_DIMENSIONS ? i+1 : i
