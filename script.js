@@ -4,7 +4,7 @@ const SELECTED_PLAYER_CELL='selectedPlayerCell'
 const DESTROYED_PLAYER_CELL='destroyedPlayerCell'
 const SHOOTED_FIELD_CELL='shootedFieldCell'
 const FIELD='field'
-const MAP_DIMENSIONS=10
+const MAP_DIMENSIONS=11
 
 const FIELD_STATE = {
     SHOOTED_FIELD:-2,
@@ -37,24 +37,43 @@ let aiShootState={
 }
 
 const checkMapBeforeAddShip=(map,isVertical,addedShips,i, j)=>{
-    if(isVertical){
-        for(let index=1;index<ships-addedShips;++index){
-            if(i+index-1>=0){ 
-                if((map[i+index-1][j]!==FIELD_STATE.EMPTY) || (i+index>=MAP_DIMENSIONS)){
-                    return false
-                }
-            }else{
-                if((map[i+index][j]!==FIELD_STATE.EMPTY) || (i+index>=MAP_DIMENSIONS)){ 
-                    return false
+    if(isVertical){    
+ 
+        let indexIUpperHelper=i-1>=0 ? i-1 : i 
+        let indexILowerHelper=(i+ships-addedShips)<MAP_DIMENSIONS ? i+ships-addedShips : MAP_DIMENSIONS-1
+
+        if(!((map[indexIUpperHelper][j]===FIELD_STATE.SHIP)||(map[indexILowerHelper][j]===FIELD_STATE.SHIP))){
+            for(let index=0;index<ships-addedShips;++index){
+                let indexHelper=i+index-1>=0 ? (i+index-1) : (i+index)
+                let indexJUpperHelper=j-1>=0 ? j-1 : j 
+                let indexJLowerHelper=j+1<MAP_DIMENSIONS ? j+1 : j 
+                if(i+index-1>=0){ 
+                    if((map[indexHelper][indexJUpperHelper]===FIELD_STATE.SHIP)||(map[indexHelper][indexJLowerHelper]===FIELD_STATE.SHIP)||
+                        (map[indexHelper-1>=0?indexHelper-1:indexHelper][j]===FIELD_STATE.SHIP)||
+                        (map[indexHelper][j]!==FIELD_STATE.EMPTY) || (i+index>=MAP_DIMENSIONS)){
+                        return false
+                    }
                 }
             }
-        }
+         }else{
+             return false
+         }
     }
-    if(!isVertical){
-        for(let index=0;index<ships-addedShips;++index){
-            if((map[i][j+index]!==FIELD_STATE.EMPTY) || (j+index>MAP_DIMENSIONS)){  
-                return false
+    if(!isVertical){ 
+        let indexJLowerHelper= (j+ships-addedShips)<MAP_DIMENSIONS ? j+ships-addedShips : MAP_DIMENSIONS-1
+        let indexJUpperHelper=j-1>=0 ? j-1 : j
+
+        if(!((map[i][indexJLowerHelper]===FIELD_STATE.SHIP)||(map[i][indexJUpperHelper]===FIELD_STATE.SHIP))){
+            for(let index=0;index<ships-addedShips;++index){
+                let indexIUpperHelper=i-1 >=0 ? i-1 : i 
+                let indexILowerHelper=i+1 <MAP_DIMENSIONS ? i+1 : i
+                if((map[indexIUpperHelper][j+index]===FIELD_STATE.SHIP)||(map[indexILowerHelper][j+index]===FIELD_STATE.SHIP)||
+                    (map[i][j+index]!==FIELD_STATE.EMPTY) || (j+index>MAP_DIMENSIONS)){  
+                    return false
+                }
             }
+        }else{
+            return false;
         }
     } 
     return true;
@@ -71,11 +90,8 @@ const addAiShips=()=>{
         let indexHelper=0;
         for(let index=aiAddedShips;index<=ships;++index){
             if(vertical){
-                if(i+indexHelper-1>=0){
-                    aiArr[i+indexHelper-1][j]=FIELD_STATE.SHIP
-                }else{
-                    aiArr[i+indexHelper][j]=FIELD_STATE.SHIP
-                }     
+                let stateHelper=i+indexHelper-1>=0?i+indexHelper-1:i+indexHelper
+                aiArr[stateHelper][j]=FIELD_STATE.SHIP
             }else{
                 aiArr[i][j+indexHelper]=FIELD_STATE.SHIP;
             }
@@ -293,4 +309,4 @@ const newGame=()=>{
         mapGenerator(aiBoard)
 }
 
-newGame();
+newGame()
