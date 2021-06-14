@@ -38,9 +38,13 @@ let aiShootState={
 
 const checkMapBeforeAddShip=(map,isVertical,addedShips,i, j)=>{
     if(isVertical){    
+        let jPlusUpperOne= j+1<MAP_DIMENSIONS ? j+1 : j
+        let jPlusLowerOne= j-1>=0 ? j-1 : j
         let indexIUpperHelper=i-1>=0 ? i-1 : i 
         let indexILowerHelper=(i+ships-addedShips)<MAP_DIMENSIONS ? i+ships-addedShips : MAP_DIMENSIONS-1
-        if(!((map[indexIUpperHelper][j]===FIELD_STATE.SHIP)||(map[indexILowerHelper][j]===FIELD_STATE.SHIP) )){
+        if(!((map[indexIUpperHelper][jPlusUpperOne]===FIELD_STATE.SHIP)||(map[indexIUpperHelper][jPlusLowerOne]===FIELD_STATE.SHIP)||
+            (map[indexILowerHelper][jPlusUpperOne]===FIELD_STATE.SHIP)||(map[indexILowerHelper][jPlusLowerOne]===FIELD_STATE.SHIP)||
+            (map[indexIUpperHelper][j]===FIELD_STATE.SHIP)||(map[indexILowerHelper][j]===FIELD_STATE.SHIP) )){
             for(let index=0;index<ships-addedShips;++index){    
                 let indexHelper=i+index-1>=0 ? i+index-1 : i+index
                 let indexJUpperHelper=j-1>=0 ? j-1 : j 
