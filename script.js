@@ -15,6 +15,7 @@ const FIELD_STATE = {
 
 const aiBoard=document.getElementById(AI_BOARD)
 const playerBoard=document.getElementById(PLAYER_BOARD)
+const verticalInfo=document.getElementById("verticalInfo")
 
 const ships=5;
 
@@ -36,8 +37,8 @@ let aiShootState={
     lastYPositionChecked:-1,
 }
 
-const checkMapBeforeAddShip=(map,isVertical,addedShips,i, j)=>{
-    if(isVertical){    
+const checkMapBeforeAddShip=(map,addedShips,i, j)=>{
+    if(vertical){    
         let jPlusUpperOne= j+1<MAP_DIMENSIONS ? j+1 : j
         let jPlusLowerOne= j-1>=0 ? j-1 : j
         let indexIUpperHelper=i-1>=0 ? i-1 : i 
@@ -59,7 +60,7 @@ const checkMapBeforeAddShip=(map,isVertical,addedShips,i, j)=>{
              return false
          }
     }
-    if(!isVertical){ 
+    if(!vertical){ 
         let indexJLowerHelper= (j+ships-addedShips)<MAP_DIMENSIONS ? j+ships-addedShips : MAP_DIMENSIONS-1
         let indexJUpperHelper=j-1>=0 ? j-1 : j
         let iPlusUpperOne= i+1<MAP_DIMENSIONS ? i+1 : i
@@ -89,9 +90,10 @@ const addAiShips=()=>{
     let i=Math.floor(Math.random()*MAP_DIMENSIONS)
     let j=Math.floor(Math.random()*MAP_DIMENSIONS)
 
-    const addShip=checkMapBeforeAddShip(aiArr,!vertical,aiAddedShips,i,j);
+    vertical= (Math.random() < 0.5) ? vertical:!vertical
+
+    const addShip=checkMapBeforeAddShip(aiArr,aiAddedShips,i,j);
     if(addShip){
-        vertical=!vertical;
         aiAddedShips++;
         let indexHelper=0;
         for(let index=aiAddedShips;index<=ships;++index){
@@ -106,7 +108,6 @@ const addAiShips=()=>{
         if(aiAddedShips===ships){
             const fieldItems=document.querySelectorAll(`div[parentboard=${AI_BOARD}]`)
             fieldItems.forEach(e=>e.addEventListener('click',shootThisAi))
-            vertical=false
         }
     }
 }
@@ -115,9 +116,8 @@ const addPlayerShips=(e)=>{
         let i= Number(e.target.getAttribute('i'))
         let j= Number(e.target.getAttribute('j'))
 
-        const addShip=checkMapBeforeAddShip(playerArr,!vertical,userAddedShips,i,j);
+        const addShip=checkMapBeforeAddShip(playerArr,userAddedShips,i,j);
         if(addShip){
-            vertical=!vertical;
             userAddedShips++;
             e.target.className+= ' ' + SELECTED_PLAYER_CELL
             let indexHelper=0;
@@ -136,9 +136,9 @@ const addPlayerShips=(e)=>{
             if(userAddedShips===ships){
                 const fieldItems=document.querySelectorAll(`div[parentboard=${PLAYER_BOARD}]`)
                 fieldItems.forEach(e=>e.removeEventListener('click',addPlayerShips))
-                vertical=false
                 while(aiAddedShips!==ships){
                     addAiShips()
+                    verticalInfo.style.display="none"
                 }
             }
         } 
@@ -314,5 +314,13 @@ const newGame=()=>{
         mapGenerator(playerBoard)
         mapGenerator(aiBoard)
 }
+
+document.addEventListener('keypress', e=>{
+    console.log("test")
+    if(e.code==="KeyR"){
+        vertical=!vertical
+        verticalInfo.innerText=vertical?"set horizontal":"set vertical"
+    }
+});
 
 newGame()

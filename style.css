@@ -26,6 +26,12 @@
     font-size: 30px;
 }
 
+#verticalInfo {
+    left: 46%;
+    top: 15%;
+    text-transform: uppercase;
+}
+
 #aiBoard {
     top: 50%;
     left: 35%;
