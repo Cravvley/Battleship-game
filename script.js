@@ -3,6 +3,7 @@ const PLAYER_BOARD='playerBoard'
 const SELECTED_PLAYER_CELL='selectedPlayerCell'
 const DESTROYED_PLAYER_CELL='destroyedPlayerCell'
 const SHOOTED_FIELD_CELL='shootedFieldCell'
+const SHOW_SELECTED_PLAYER_CELLS="showSelectedPlayerCells"
 const FIELD='field'
 const MAP_DIMENSIONS=12
 
@@ -119,19 +120,21 @@ const addPlayerShips=(e)=>{
         const addShip=checkMapBeforeAddShip(playerArr,userAddedShips,i,j);
         if(addShip){
             userAddedShips++;
-            e.target.className+= ' ' + SELECTED_PLAYER_CELL
             let indexHelper=0;
+            let fieldItem;
             for(let index=userAddedShips;index<=ships;++index){
                 if(vertical){
                     playerArr[i+indexHelper][j]=FIELD_STATE.SHIP
-                    const fieldItem=document.querySelector(`div[i="${i+indexHelper}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
+                    fieldItem=document.querySelector(`div[i="${i+indexHelper}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
                     fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }else{
                     playerArr[i][j+indexHelper]=FIELD_STATE.SHIP
-                    const fieldItem=document.querySelector(`div[i="${i}"][j="${j+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
+                    fieldItem=document.querySelector(`div[i="${i}"][j="${j+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
                     fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }
                 indexHelper++;
+                fieldItem.removeEventListener("mouseover",highlightField)
+                fieldItem.removeEventListener("mouseout",turnOffHighlightFIeld)
             }
             if(userAddedShips===ships){
                 const fieldItems=document.querySelectorAll(`div[parentboard=${PLAYER_BOARD}]`)
@@ -302,17 +305,36 @@ const mapGenerator=(map)=>{
             div.style.height= mapHeight
             if(div.getAttribute("parentboard")===PLAYER_BOARD){
                 div.addEventListener('click',addPlayerShips)
+                div.addEventListener("mouseover",highlightField)
+                div.addEventListener("mouseout",turnOffHighlightFIeld)
             }
             map.append(div)
         }   
     } 
 }
 
-const newGame=()=>{    
-        aiArr=Array.from(Array(MAP_DIMENSIONS), () => new Array(MAP_DIMENSIONS).fill(0))
-        playerArr=Array.from(Array(MAP_DIMENSIONS), () => new Array(MAP_DIMENSIONS).fill(0))
-        mapGenerator(playerBoard)
-        mapGenerator(aiBoard)
+const highlightField=e=>{
+    const i=Number(e.target.getAttribute("i"))
+    const j=Number(e.target.getAttribute("j"))
+     const correctPosition=checkMapBeforeAddShip(playerArr,userAddedShips,i,j);
+     if(correctPosition){
+        let indexHelper=0;
+        for(let index=userAddedShips+1;index<=ships;++index){
+            if(vertical){
+                let fieldItem=document.querySelector(`div[i="${i+indexHelper}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
+                fieldItem.classList.add(SHOW_SELECTED_PLAYER_CELLS)
+            }else{
+                let fieldItem=document.querySelector(`div[i="${i}"][j="${j+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
+                fieldItem.classList.add(SHOW_SELECTED_PLAYER_CELLS)
+            }
+            indexHelper++;
+        }
+    }
+}
+
+const turnOffHighlightFIeld=()=>{
+    let fieldItems=document.querySelectorAll(`.${SHOW_SELECTED_PLAYER_CELLS}`)
+    fieldItems.forEach(item=>item.classList.remove(SHOW_SELECTED_PLAYER_CELLS))
 }
 
 document.addEventListener('keypress', e=>{
@@ -321,5 +343,12 @@ document.addEventListener('keypress', e=>{
         verticalInfo.innerText=vertical?"set horizontal":"set vertical"
     }
 });
+
+const newGame=()=>{    
+        aiArr=Array.from(Array(MAP_DIMENSIONS), () => new Array(MAP_DIMENSIONS).fill(0))
+        playerArr=Array.from(Array(MAP_DIMENSIONS), () => new Array(MAP_DIMENSIONS).fill(0))
+        mapGenerator(playerBoard)
+        mapGenerator(aiBoard)
+}
 
 newGame()

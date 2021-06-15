@@ -59,6 +59,10 @@
     border: 2px black solid;
 }
 
+.showSelectedPlayerCells {
+    background-color: blue;
+}
+
 .selectedPlayerCell {
     background-color: greenyellow;
 }
