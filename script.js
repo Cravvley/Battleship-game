@@ -316,7 +316,6 @@ const newGame=()=>{
 }
 
 document.addEventListener('keypress', e=>{
-    console.log("test")
     if(e.code==="KeyR"){
         vertical=!vertical
         verticalInfo.innerText=vertical?"set horizontal":"set vertical"
