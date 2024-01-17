@@ -340,7 +340,7 @@ const turnOffHighlightFIeld=()=>{
 document.addEventListener('keypress', e=>{
     if(e.code==="KeyR"){
         vertical=!vertical
-        verticalInfo.innerText=vertical?"set horizontal":"set vertical"
+        verticalInfo.innerText=vertical?"set horizontal (Press r to change direction)":"set vertical (Press r to change direction)"
     }
 });
 
