@@ -180,6 +180,17 @@ body.light-theme .title-main {
   color: var(--ocean-light);
 }
 
+#endGameContainer {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+#endGameContainer.visible {
+  display: flex;
+}
+
 #endGameH2 {
   font-family: 'JetBrains Mono', monospace;
   font-size: clamp(1.5rem, 3vw, 2.25rem);
@@ -190,6 +201,10 @@ body.light-theme .title-main {
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
 }
 
+#endGameH2:empty {
+  display: none;
+}
+
 #endGameH2.game-over.won {
   color: var(--ship);
 }
@@ -198,8 +213,23 @@ body.light-theme .title-main {
   color: var(--hit);
 }
 
-#endGameH2:empty {
+.btn-reset {
   display: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  background: var(--ocean-light);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-reset:hover {
+  background: #3b82f6;
+  transform: scale(1.02);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -220,7 +250,7 @@ main {
   padding: 2rem 1rem;
 }
 
-#endGameH2 {
+#endGameContainer {
   grid-column: 1 / -1;
   grid-row: 1;
 }
@@ -368,10 +398,11 @@ main {
 }
 
 /* Ship placement — preview (hover) */
-.showSelectedPlayerCells {
-  background: var(--ship-hover) !important;
-  border-color: var(--ship) !important;
-  box-shadow: inset 0 0 12px rgba(34, 197, 94, 0.3);
+.field.showSelectedPlayerCells {
+  background: rgba(34, 197, 94, 0.55) !important;
+  border: 2px dashed var(--ship) !important;
+  box-shadow: inset 0 0 16px rgba(34, 197, 94, 0.4), 0 0 0 2px rgba(34, 197, 94, 0.3) !important;
+  z-index: 1;
 }
 
 /* Ship placed */
@@ -430,7 +461,7 @@ main {
     padding-top: 4rem;
   }
 
-  #endGameH2,
+  #endGameContainer,
   #verticalInfo {
     grid-column: 1;
     grid-row: 1;

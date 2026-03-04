@@ -18,7 +18,7 @@ const aiBoard=document.getElementById(AI_BOARD)
 const playerBoard=document.getElementById(PLAYER_BOARD)
 const verticalInfo=document.getElementById("verticalInfo")
 
-const ships=5;
+const SHIP_SIZES=[5,4,3,3,2]
 
 let aiArr=[]
 let playerArr=[]
@@ -38,16 +38,19 @@ let aiShootState={
     lastYPositionChecked:-1,
 }
 
+const getCurrentShipSize=(addedShips)=>SHIP_SIZES[addedShips]
+
 const checkMapBeforeAddShip=(map,addedShips,i, j)=>{
+    const shipSize=getCurrentShipSize(addedShips)
     if(vertical){    
         let jPlusUpperOne= j+1<MAP_DIMENSIONS ? j+1 : j
         let jPlusLowerOne= j-1>=0 ? j-1 : j
         let indexIUpperHelper=i-1>=0 ? i-1 : i 
-        let indexILowerHelper=(i+ships-addedShips)<MAP_DIMENSIONS ? i+ships-addedShips : MAP_DIMENSIONS-1
+        let indexILowerHelper=(i+shipSize)<MAP_DIMENSIONS ? i+shipSize : MAP_DIMENSIONS-1
         if(!((map[indexIUpperHelper][jPlusUpperOne]===FIELD_STATE.SHIP)||(map[indexIUpperHelper][jPlusLowerOne]===FIELD_STATE.SHIP)||
             (map[indexILowerHelper][jPlusUpperOne]===FIELD_STATE.SHIP)||(map[indexILowerHelper][jPlusLowerOne]===FIELD_STATE.SHIP)||
             (map[indexIUpperHelper][j]===FIELD_STATE.SHIP)||(map[indexILowerHelper][j]===FIELD_STATE.SHIP) )){
-            for(let index=0;index<ships-addedShips;++index){    
+            for(let index=0;index<shipSize;++index){    
                 let indexHelper=i+index-1>=0 ? i+index-1 : i+index
                 let indexJUpperHelper=j-1>=0 ? j-1 : j 
                 let indexJLowerHelper=j+1<MAP_DIMENSIONS ? j+1 : j 
@@ -62,21 +65,21 @@ const checkMapBeforeAddShip=(map,addedShips,i, j)=>{
          }
     }
     if(!vertical){ 
-        let indexJLowerHelper= (j+ships-addedShips)<MAP_DIMENSIONS ? j+ships-addedShips : MAP_DIMENSIONS-1
+        let indexJLowerHelper= (j+shipSize)<MAP_DIMENSIONS ? j+shipSize : MAP_DIMENSIONS-1
         let indexJUpperHelper=j-1>=0 ? j-1 : j
         let iPlusUpperOne= i+1<MAP_DIMENSIONS ? i+1 : i
         let iPlusLowerOne= i-1>=0 ? i-1 : i
         let jMinusStartUpperOne= j-1>=0 ? j-1 : j
-        let jPlusStartUpperOne = (j+ships-addedShips)<MAP_DIMENSIONS?j+ships-addedShips:MAP_DIMENSIONS-1
+        let jPlusStartUpperOne = (j+shipSize)<MAP_DIMENSIONS?j+shipSize:MAP_DIMENSIONS-1
 
         if(!((map[iPlusUpperOne][jMinusStartUpperOne]===FIELD_STATE.SHIP)||(map[iPlusUpperOne][jPlusStartUpperOne]===FIELD_STATE.SHIP)||
         (map[iPlusLowerOne][jMinusStartUpperOne]===FIELD_STATE.SHIP)||(map[iPlusLowerOne][jPlusStartUpperOne]===FIELD_STATE.SHIP)||
         (map[i][indexJLowerHelper]===FIELD_STATE.SHIP)||(map[i][indexJUpperHelper]===FIELD_STATE.SHIP))){
-            for(let index=0;index<ships-addedShips;++index){
+            for(let index=0;index<shipSize;++index){
                 let indexIUpperHelper=i-1 >=0 ? i-1 : i 
                 let indexILowerHelper=i+1 <MAP_DIMENSIONS ? i+1 : i
                 if((map[indexIUpperHelper][j+index]===FIELD_STATE.SHIP)||(map[indexILowerHelper][j+index]===FIELD_STATE.SHIP)||
-                    (map[i][j+index]!==FIELD_STATE.EMPTY) || (j+index>MAP_DIMENSIONS)){  
+                    (map[i][j+index]!==FIELD_STATE.EMPTY) || (j+index>=MAP_DIMENSIONS)){  
                     return false
                 }
             }
@@ -95,18 +98,16 @@ const addAiShips=()=>{
 
     const addShip=checkMapBeforeAddShip(aiArr,aiAddedShips,i,j);
     if(addShip){
+        const shipSize=getCurrentShipSize(aiAddedShips)
         aiAddedShips++;
-        let indexHelper=0;
-        for(let index=aiAddedShips;index<=ships;++index){
+        for(let index=0;index<shipSize;++index){
             if(vertical){
-                let stateHelper=i+indexHelper-1>=0?i+indexHelper-1:i+indexHelper
-                aiArr[stateHelper][j]=FIELD_STATE.SHIP
+                aiArr[i+index][j]=FIELD_STATE.SHIP
             }else{
-                aiArr[i][j+indexHelper]=FIELD_STATE.SHIP;
+                aiArr[i][j+index]=FIELD_STATE.SHIP;
             }
-            indexHelper++;
         }
-        if(aiAddedShips===ships){
+        if(aiAddedShips===SHIP_SIZES.length){
             const fieldItems=document.querySelectorAll(`div[parentboard=${AI_BOARD}]`)
             fieldItems.forEach(e=>e.addEventListener('click',shootThisAi))
         }
@@ -114,33 +115,35 @@ const addAiShips=()=>{
 }
 
 const addPlayerShips=(e)=>{
+        turnOffHighlightFIeld()
         addRipple(e,e.target)
         let i= Number(e.target.getAttribute('i'))
         let j= Number(e.target.getAttribute('j'))
 
         const addShip=checkMapBeforeAddShip(playerArr,userAddedShips,i,j);
         if(addShip){
+            const shipSize=getCurrentShipSize(userAddedShips)
             userAddedShips++;
-            let indexHelper=0;
             let fieldItem;
-            for(let index=userAddedShips;index<=ships;++index){
+            for(let index=0;index<shipSize;++index){
                 if(vertical){
-                    playerArr[i+indexHelper][j]=FIELD_STATE.SHIP
-                    fieldItem=document.querySelector(`div[i="${i+indexHelper}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
+                    playerArr[i+index][j]=FIELD_STATE.SHIP
+                    fieldItem=document.querySelector(`div[i="${i+index}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
                     fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }else{
-                    playerArr[i][j+indexHelper]=FIELD_STATE.SHIP
-                    fieldItem=document.querySelector(`div[i="${i}"][j="${j+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
+                    playerArr[i][j+index]=FIELD_STATE.SHIP
+                    fieldItem=document.querySelector(`div[i="${i}"][j="${j+index}"][parentboard=${PLAYER_BOARD}]`)
                     fieldItem.classList.add(SELECTED_PLAYER_CELL)
                 }
-                indexHelper++;
-                fieldItem.removeEventListener("mouseover",highlightField)
-                fieldItem.removeEventListener("mouseout",turnOffHighlightFIeld)
+                fieldItem.removeEventListener("mouseenter",highlightField)
+                fieldItem.removeEventListener("pointerenter",highlightField)
+                fieldItem.removeEventListener("touchstart",highlightField)
+                fieldItem.removeEventListener("pointerdown",highlightField)
             }
-            if(userAddedShips===ships){
+            if(userAddedShips===SHIP_SIZES.length){
                 const fieldItems=document.querySelectorAll(`div[parentboard=${PLAYER_BOARD}]`)
                 fieldItems.forEach(e=>e.removeEventListener('click',addPlayerShips))
-                while(aiAddedShips!==ships){
+                while(aiAddedShips!==SHIP_SIZES.length){
                     addAiShips()
                     verticalInfo.style.display="none"
                 }
@@ -151,6 +154,8 @@ const addPlayerShips=(e)=>{
 const endGame=()=>{
     if(!playerArr.some(e=>e.includes(FIELD_STATE.SHIP)) || !aiArr.some(e=>e.includes(FIELD_STATE.SHIP))){
         const endGameField=document.getElementById("endGameH2")
+        const endGameContainer=document.getElementById("endGameContainer")
+        const resetGameBtn=document.getElementById("resetGameBtn")
         const playerFieldItems=document.querySelectorAll(`div[parentboard=${AI_BOARD}]`)
         playerFieldItems.forEach(e=>e.removeEventListener('click',shootThisAi))
 
@@ -162,7 +167,31 @@ const endGame=()=>{
             endGameField.innerText="You won"
             endGameField.className="game-over won"
         }
+        if(endGameContainer) endGameContainer.classList.add("visible")
+        if(resetGameBtn) resetGameBtn.style.display="inline-block"
     }
+}
+
+const resetGame=()=>{
+    userAddedShips=0
+    aiAddedShips=0
+    aiShootState={ checkTop:false, checkRight:false, checkBottom:false, checkLeft:false, firstXPositionChecked:-1, firstYPositionChecked:-1, lastXPositionChecked:-1, lastYPositionChecked:-1 }
+    vertical=false
+
+    const endGameField=document.getElementById("endGameH2")
+    const endGameContainer=document.getElementById("endGameContainer")
+    const resetGameBtn=document.getElementById("resetGameBtn")
+    if(endGameField){
+        endGameField.innerText=""
+        endGameField.className=""
+    }
+    if(endGameContainer) endGameContainer.classList.remove("visible")
+    if(resetGameBtn) resetGameBtn.style.display="none"
+    if(verticalInfo) verticalInfo.style.display=""
+
+    aiBoard.innerHTML=""
+    playerBoard.innerHTML=""
+    newGame()
 }
 
 const shootThisAi=e=>{
@@ -309,8 +338,10 @@ const mapGenerator=(map)=>{
             div.style.height= mapHeight
             if(div.getAttribute("parentboard")===PLAYER_BOARD){
                 div.addEventListener('click',addPlayerShips)
-                div.addEventListener("mouseover",highlightField)
-                div.addEventListener("mouseout",turnOffHighlightFIeld)
+                div.addEventListener("mouseenter",highlightField)
+                div.addEventListener("pointerenter",highlightField)
+                div.addEventListener("touchstart",highlightField,{passive:true})
+                div.addEventListener("pointerdown",highlightField)
             }
             map.append(div)
         }   
@@ -318,27 +349,38 @@ const mapGenerator=(map)=>{
 }
 
 const highlightField=e=>{
-    const i=Number(e.target.getAttribute("i"))
-    const j=Number(e.target.getAttribute("j"))
-     const correctPosition=checkMapBeforeAddShip(playerArr,userAddedShips,i,j);
-     if(correctPosition){
-        let indexHelper=0;
-        for(let index=userAddedShips+1;index<=ships;++index){
-            if(vertical){
-                let fieldItem=document.querySelector(`div[i="${i+indexHelper}"][j="${j}"][parentboard=${PLAYER_BOARD}]`)
-                fieldItem.classList.add(SHOW_SELECTED_PLAYER_CELLS)
-            }else{
-                let fieldItem=document.querySelector(`div[i="${i}"][j="${j+indexHelper}"][parentboard=${PLAYER_BOARD}]`)
-                fieldItem.classList.add(SHOW_SELECTED_PLAYER_CELLS)
-            }
-            indexHelper++;
+    if(userAddedShips>=SHIP_SIZES.length) return
+    const cell=e.target
+    if(!cell.classList.contains(FIELD)||cell.getAttribute("parentboard")!==PLAYER_BOARD) return
+    turnOffHighlightFIeld()
+    const i=Number(cell.getAttribute("i"))
+    const j=Number(cell.getAttribute("j"))
+    const correctPosition=checkMapBeforeAddShip(playerArr,userAddedShips,i,j)
+    if(correctPosition){
+        const shipSize=getCurrentShipSize(userAddedShips)
+        for(let index=0;index<shipSize;++index){
+            const fieldItem=playerBoard.querySelector(`div.field[i="${i+(vertical?index:0)}"][j="${j+(vertical?0:index)}"]`)
+            if(fieldItem) fieldItem.classList.add(SHOW_SELECTED_PLAYER_CELLS)
         }
     }
 }
 
 const turnOffHighlightFIeld=()=>{
-    let fieldItems=document.querySelectorAll(`.${SHOW_SELECTED_PLAYER_CELLS}`)
-    fieldItems.forEach(item=>item.classList.remove(SHOW_SELECTED_PLAYER_CELLS))
+    document.querySelectorAll(`.${SHOW_SELECTED_PLAYER_CELLS}`).forEach(item=>item.classList.remove(SHOW_SELECTED_PLAYER_CELLS))
+}
+
+const highlightFromTouch=(e)=>{
+    if(!e.touches?.length) return
+    const el=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY)
+    if(el?.classList?.contains(FIELD)&&el.getAttribute("parentboard")===PLAYER_BOARD) highlightField({target:el})
+}
+
+if(playerBoard){
+    playerBoard.addEventListener('mouseleave',turnOffHighlightFIeld)
+    playerBoard.addEventListener('touchmove',highlightFromTouch,{passive:true})
+    document.addEventListener('touchend',turnOffHighlightFIeld,{passive:true})
+    document.addEventListener('touchcancel',turnOffHighlightFIeld,{passive:true})
+    document.addEventListener('pointerup',turnOffHighlightFIeld)
 }
 
 document.addEventListener('keypress', e=>{
@@ -382,5 +424,7 @@ const newGame=()=>{
 document.getElementById('themeBtn')?.addEventListener('click',()=>{
     document.body.classList.toggle('light-theme')
 })
+
+document.getElementById('resetGameBtn')?.addEventListener('click',resetGame)
 
 newGame()
