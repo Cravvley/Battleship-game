@@ -1,13 +1,30 @@
-Battleship game written in javascript, you can play it at https://cravvley.github.io/Battleship-game/
+# Battleship Game
 
-Position your ships, press R to change the direction of the ship.
-![image](https://github.com/Cravvley/Battleship-game/assets/43401559/196ae723-de85-4115-9d84-5784decfbbfe)
+A game written in JavaScript. Play it at: https://cravvley.github.io/Battleship-game/
 
-![image](https://github.com/Cravvley/Battleship-game/assets/43401559/0385e1f8-f23c-47fa-a4cf-a2f01825348f)
+## How to Play
 
-defeat your opponent :D
+### Setup Phase
 
-![image](https://github.com/Cravvley/Battleship-game/assets/43401559/598a3e7e-27b6-4fc4-b054-6f9298c9e524)
+1. **Place your ships** — click on your board (right) to place 5 ships. Each ship occupies 5 cells in a row.
+2. **Change direction** — press **R** to switch between vertical and horizontal placement.
+3. **Valid placement** — ships cannot touch each other (including diagonally). Green cells show where your ship will be placed when you hover.
+4. Once all 5 ships are placed, the game starts automatically.
 
-or not :/
-![image](https://github.com/Cravvley/Battleship-game/assets/43401559/3c4cfa1d-1250-4d07-92d8-9a3f5dc19dba)
+### Battle Phase
+
+1. **Your turn** — click a cell on the **AI board** (left) to shoot.
+2. **Hit** — red cell with 💥 means you hit an enemy ship.
+3. **Miss** — gray cell with × means you missed.
+4. **AI turn** — after each of your shots, the AI shoots at your board automatically.
+
+### Winning
+
+- **You win** — when all AI ships are destroyed (all 5 ships sunk).
+- **You lose** — when all your ships are destroyed.
+
+### Board Layout
+
+- **12×12 grid** with coordinates (A–L for columns, 1–12 for rows).
+- **5 ships** of 5 cells each.
+- Ships are placed randomly on the AI board at the start.
