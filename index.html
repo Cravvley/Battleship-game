@@ -33,7 +33,10 @@
                 <div id="playerBoard" class="gameBoard"></div>
             </div>
         </div>
-        <h2 id="verticalInfo" class="boardH2">set vertical (Press r to change direction)</h2>
+        <div id="rotateRow" class="rotate-row">
+            <h2 id="verticalInfo" class="boardH2"><span id="verticalInfoDir">set vertical</span><span class="vertical-info-hint"> (Press r to change direction)</span></h2>
+            <button id="rotateShipBtn" class="btn-rotate" type="button" aria-label="Rotate ship">↻ Rotate</button>
+        </div>
     </main>
 </body>
 <script src="script.js" type="text/javascript"></script>

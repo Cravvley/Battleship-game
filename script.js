@@ -145,7 +145,9 @@ const addPlayerShips=(e)=>{
                 fieldItems.forEach(e=>e.removeEventListener('click',addPlayerShips))
                 while(aiAddedShips!==SHIP_SIZES.length){
                     addAiShips()
-                    verticalInfo.style.display="none"
+                    const rotateRow=document.getElementById('rotateRow')
+                    if(verticalInfo) verticalInfo.style.display="none"
+                    if(rotateRow) rotateRow.style.display="none"
                 }
             }
         } 
@@ -188,6 +190,10 @@ const resetGame=()=>{
     if(endGameContainer) endGameContainer.classList.remove("visible")
     if(resetGameBtn) resetGameBtn.style.display="none"
     if(verticalInfo) verticalInfo.style.display=""
+    const rotateRow=document.getElementById('rotateRow')
+    if(rotateRow) rotateRow.style.display=""
+    const verticalInfoDir=document.getElementById('verticalInfoDir')
+    if(verticalInfoDir) verticalInfoDir.textContent="set vertical"
 
     aiBoard.innerHTML=""
     playerBoard.innerHTML=""
@@ -383,12 +389,14 @@ if(playerBoard){
     document.addEventListener('pointerup',turnOffHighlightFIeld)
 }
 
+const toggleVertical=()=>{
+    vertical=!vertical
+    document.getElementById('verticalInfoDir').textContent=vertical?"set horizontal":"set vertical"
+}
 document.addEventListener('keypress', e=>{
-    if(e.code==="KeyR"){
-        vertical=!vertical
-        verticalInfo.innerText=vertical?"set horizontal (Press r to change direction)":"set vertical (Press r to change direction)"
-    }
-});
+    if(e.code==="KeyR") toggleVertical()
+})
+document.getElementById('rotateShipBtn')?.addEventListener('click',toggleVertical)
 
 const LETTERS='ABCDEFGHIJKL'
 

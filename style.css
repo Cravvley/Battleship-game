@@ -173,11 +173,56 @@ body.light-theme .title-main {
   letter-spacing: 0.02em;
 }
 
+.rotate-row {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
 #verticalInfo {
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ocean-light);
+  margin: 0;
+}
+
+.btn-rotate {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .vertical-info-hint {
+    display: none;
+  }
+
+  .btn-rotate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn-rotate:hover {
+    background: var(--ocean-light);
+    color: white;
+    border-color: var(--ocean-light);
+  }
 }
 
 #endGameContainer {
@@ -240,9 +285,10 @@ main {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto auto;
   gap: 1rem clamp(2rem, 6vw, 4rem);
   align-items: start;
+  align-content: start;
   justify-items: center;
   max-width: 950px;
   margin: 0 auto;
@@ -251,11 +297,6 @@ main {
 }
 
 #endGameContainer {
-  grid-column: 1 / -1;
-  grid-row: 1;
-}
-
-#verticalInfo {
   grid-column: 1 / -1;
   grid-row: 1;
 }
@@ -477,6 +518,14 @@ main {
     grid-row: 3;
   }
 
+  .rotate-row {
+    grid-row: 4;
+  }
+
+  main {
+    grid-template-rows: auto auto auto auto;
+  }
+
   .gameBoard {
     height: min(32vh, 320px);
     width: min(32vh, 320px);
@@ -545,9 +594,19 @@ main {
     min-width: 180px;
   }
 
+  .rotate-row {
+    gap: 0.5rem;
+  }
+
   #verticalInfo {
     font-size: 0.7rem;
     letter-spacing: 0.05em;
+  }
+
+  .btn-rotate {
+    min-height: 44px;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.85rem;
   }
 
   #endGameH2 {
