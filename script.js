@@ -114,6 +114,7 @@ const addAiShips=()=>{
 }
 
 const addPlayerShips=(e)=>{
+        addRipple(e,e.target)
         let i= Number(e.target.getAttribute('i'))
         let j= Number(e.target.getAttribute('j'))
 
@@ -155,14 +156,17 @@ const endGame=()=>{
 
         if(!playerArr.some(e=>e.includes(FIELD_STATE.SHIP))){
             endGameField.innerText="You lost"
+            endGameField.className="game-over lost"
         }
         else if(!aiArr.some(e=>e.includes(FIELD_STATE.SHIP))){
             endGameField.innerText="You won"
+            endGameField.className="game-over won"
         }
     }
 }
 
 const shootThisAi=e=>{
+    addRipple(e,e.target)
     const i= Number(e.target.getAttribute('i'))
     const j= Number(e.target.getAttribute('j'))
 
@@ -344,11 +348,39 @@ document.addEventListener('keypress', e=>{
     }
 });
 
+const LETTERS='ABCDEFGHIJKL'
+
+const initCoords=(boardId)=>{
+    const lettersEl=document.getElementById(boardId+'CoordLetters')
+    const numbersEl=document.getElementById(boardId+'CoordNumbers')
+    if(!lettersEl||!numbersEl)return
+    lettersEl.innerHTML=LETTERS.split('').map(l=>`<span>${l}</span>`).join('')
+    numbersEl.innerHTML=Array.from({length:MAP_DIMENSIONS},(_,i)=>`<span>${i+1}</span>`).join('')
+}
+
+const addRipple=(e,el)=>{
+    const rect=el.getBoundingClientRect()
+    const x=e.clientX-rect.left
+    const y=e.clientY-rect.top
+    const ripple=document.createElement('span')
+    ripple.className='ripple'
+    ripple.style.left=x+'px'
+    ripple.style.top=y+'px'
+    el.appendChild(ripple)
+    setTimeout(()=>ripple.remove(),600)
+}
+
 const newGame=()=>{    
         aiArr=Array.from(Array(MAP_DIMENSIONS), () => new Array(MAP_DIMENSIONS).fill(0))
         playerArr=Array.from(Array(MAP_DIMENSIONS), () => new Array(MAP_DIMENSIONS).fill(0))
         mapGenerator(playerBoard)
         mapGenerator(aiBoard)
+        initCoords('ai')
+        initCoords('player')
 }
+
+document.getElementById('themeBtn')?.addEventListener('click',()=>{
+    document.body.classList.toggle('light-theme')
+})
 
 newGame()

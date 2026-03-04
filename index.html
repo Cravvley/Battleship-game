@@ -10,14 +10,25 @@
 </head>
 
 <body>
-    <h1 id="gameName">Battleship game</h1>
+    <button id="themeBtn" class="btn-icon" title="Toggle dark/light">◐</button>
+    <h1 id="gameName"><span class="title-main">Battleship</span> <span class="title-sub">game</span></h1>
     <main>
         <h2 id="endGameH2"></h2>
-        <h2 id="aiBoardH2" class="boardH2">Ai board</h2>
-        <div id="aiBoard" class="gameBoard">
+        <div class="boardWrapper">
+            <h2 id="aiBoardH2" class="boardH2">Ai board</h2>
+            <div class="boardCoords">
+                <div class="coordLetters" id="aiCoordLetters"></div>
+                <div class="coordNumbers" id="aiCoordNumbers"></div>
+                <div id="aiBoard" class="gameBoard"></div>
+            </div>
         </div>
-        <h2 id="playerBoardH2" class="boardH2">Player board</h2>
-        <div id="playerBoard" class="gameBoard">
+        <div class="boardWrapper">
+            <h2 id="playerBoardH2" class="boardH2">Player board</h2>
+            <div class="boardCoords">
+                <div class="coordLetters" id="playerCoordLetters"></div>
+                <div class="coordNumbers" id="playerCoordNumbers"></div>
+                <div id="playerBoard" class="gameBoard"></div>
+            </div>
         </div>
         <h2 id="verticalInfo" class="boardH2">set vertical (Press r to change direction)</h2>
     </main>
